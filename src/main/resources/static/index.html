@@ -26,8 +26,78 @@
 	<div class="container-fluid">
 	<div class="jumbotron">
 	<br/>
+	
 	<form action="/submitQuery" method="get">
-		<input type="text" placeholder="enter the query" name="query" />
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" style="width: 700px;" placeholder="enter the query" name="name"/>
+		
+    <input type="submit" class="btn btn-outline-secondary"  value="submit"/>
+  </div>
+ 	
+		
+	</form>
+
+	<br/>
+	</div>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>NLIDB</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container">
+    		<div class="navbar-header">
+      			<a class="navbar-brand" href="index.html">
+      			<span class="glyphicon glyphicon-file"></span> NLIDB</a>
+    		</div>
+    		<ul class="nav navbar-nav navbar-right" style="color:orange;">
+      			<li class="active"><a href="#">Home <span class="glyphicon glyphicon-home"></span> </a></li>
+    		</ul>
+  		</div>
+	</nav>
+	<div class="container-fluid">
+	<div class="jumbotron">
+	<br/>
+	<form action="/submitQuery" method="get">
+		<input type="text" placeholder="enter the query" name="name" />
 		<input type="submit" value="submit"/>
 	</form>
 	<br/>
@@ -35,4 +105,4 @@
 	<h2 id="result">${message}</h2>
 	</div>
 </body>
-</html>
+</html-->

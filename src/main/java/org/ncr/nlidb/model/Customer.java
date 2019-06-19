@@ -20,7 +20,7 @@ public class Customer {
 	private String customerPhone;
 	
 	@Column(name="customer_id")
-	public int getCustomerid() {
+	public int getCustomerId() {
 		return customerId;
 	}
 	

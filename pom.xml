@@ -17,6 +17,12 @@
 	</properties>
 
 	<dependencies>	
+		<dependency>
+    		<groupId>edu.stanford.nlp</groupId>
+    		<artifactId>stanford-corenlp</artifactId>
+    		<version>3.8.0</version>
+		</dependency>
+		
 		<dependency> 
          <groupId>org.apache.opennlp</groupId> 
          <artifactId>opennlp-tools</artifactId> 
@@ -55,7 +61,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+		<dependency>
+    		<groupId>com.google.code.gson</groupId>
+    		<artifactId>gson</artifactId>
+    	</dependency>
+		</dependencies>
 
 	<build>
 		<plugins>

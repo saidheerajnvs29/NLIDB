@@ -5,7 +5,7 @@ import org.ncr.nlidb.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
-public interface BankDetailsRepository extends JpaRepository<BankDetails,Long>
+public interface BankDetailsRepository extends JpaRepository<BankDetails,Long>,BankDetailsRepositoryCustom
 {
 	
 }
