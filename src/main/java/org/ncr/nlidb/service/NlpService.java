@@ -12,13 +12,20 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
+
+import org.json.simple.JSONObject;
 import org.ncr.nlidb.model.AccountDetails;
 import org.ncr.nlidb.model.AtmTerminal;
 import org.ncr.nlidb.model.BankDetails;
+import org.ncr.nlidb.model.CardDetails;
 import org.ncr.nlidb.model.Customer;
-
+import org.ncr.nlidb.model.Product;
 import org.ncr.nlidb.model.TableDictionary;
+import org.ncr.nlidb.model.TransactionDetails;
 import org.ncr.nlidb.repository.AccountDetailsRepository;
 import org.ncr.nlidb.repository.AtmTerminalRepository;
 import org.ncr.nlidb.repository.BankDetailsRepository;
@@ -36,6 +43,8 @@ import org.springframework.ui.Model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import opennlp.tools.chunker.ChunkerME;
@@ -63,8 +72,11 @@ public class NlpService
 	private AtmTerminalRepository atmRepository;
 	@Autowired
 	private AccountDetailsRepository accountRepository;
+	@Autowired
 	private ProductRepository productRepository;
+	@Autowired
 	private CardDetailsRepository cardRepository;
+	@Autowired
 	private TransactionDetailsRepository transactionRepository;
 	
 	public String[] getTokens(String sentence) throws InvalidFormatException, IOException
@@ -127,6 +139,7 @@ public class NlpService
 	
 	
 
+	@SuppressWarnings("unchecked")
 	public String getResults(List<String>lemmas,List<String> tags) throws IOException
 	{
 		
@@ -134,10 +147,12 @@ public class NlpService
 		List<BankDetails> bankDetails=new ArrayList<BankDetails>();
 		List<AtmTerminal> atmDetails=new ArrayList<AtmTerminal>();
 		List<AccountDetails> accountDetails=new ArrayList<AccountDetails>();
-		
+		List<Product> products=new ArrayList<>();
+		List<CardDetails> cardDetails=new ArrayList<>();
+		List<TransactionDetails> transactionDetails=new ArrayList<>();
 		
 		Gson gsonBuilder = new GsonBuilder().create();
-		FileWriter fw=new FileWriter("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json"); 
+	
 		List<TableDictionary> tableDictionary=new ArrayList<>();
 
 		ddr.findAll().forEach(tableDictionary::add);
@@ -165,12 +180,8 @@ public class NlpService
 						   {
 				    		   System.out.println("in size 1");
 				    		   String jsonFromPojo = gsonBuilder.toJson(customers);
-				    		   fw.write(jsonFromPojo);   
-				    		   fw.flush();
-				    		   fw.close();
-				    		   //FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
 				    		  
-				    		   return "viewTable.html";
+				    		   return jsonFromPojo;
 						   }
 				    	   flag=1;
 				       }
@@ -180,45 +191,77 @@ public class NlpService
 				    	   if(lemmas.size()==1)
 				    	   {
 				    		   String jsonFromPojo = gsonBuilder.toJson(bankDetails);
-				    		   fw.write(jsonFromPojo);   
-				    		   fw.flush();
-					           fw.close();  
-				    		   return "viewTable.html";
+				    		 
+				    		   return jsonFromPojo;
 				    	   }
 				    	   flag=1;
 				       }
 				       else if(tableName.equals("atm_terminal"))
 				       {
 				    	   atmRepository.findAll().forEach(atmDetails::add);
+				    	   if(lemmas.size()==1)
+				    	   {
+				    		   String jsonFromPojo = gsonBuilder.toJson(atmDetails);
+				    	
+				    		   return jsonFromPojo;
+				    	   }
 				    	   flag=1;
 				       }
 				       else if(tableName.equals("account_details"))
 				       {
 				    	   accountRepository.findAll().forEach(accountDetails::add);
+				    	   if(lemmas.size()==1)
+				    	   {
+				    		   String jsonFromPojo = gsonBuilder.toJson(accountDetails);
+				    		  
+				    		   return jsonFromPojo;
+				    	   }
 				    	   flag=1;
 				       }
 				       else if(tableName.equals("product"))
 				       {
-				    	   customerRepository.findAll().forEach(customers::add);
+				    	   productRepository.findAll().forEach(products::add);
+				    	   if(lemmas.size()==1)
+				    	   {
+				    		   String jsonFromPojo = gsonBuilder.toJson(products);
+				    		   
+				    		   return jsonFromPojo;
+				    	   }
 				    	   flag=1;
 				       }
 				       else if(tableName.equals("card_details"))
 				       {
-				    	   bankRepository.findAll().forEach(bankDetails::add);
+				    	   cardRepository.findAll().forEach(cardDetails::add);
+				    	   for(CardDetails c:cardDetails)
+				    	   {
+				    		   System.out.println(c);
+				    	   }
+				    	   if(lemmas.size()==1)
+				    	   {
+				    		   String jsonFromPojo = gsonBuilder.toJson(cardDetails);
+				    		  
+				    		   return jsonFromPojo;
+				    	   }
 				    	   flag=1;
 				       }
 				       else if(tableName.equals("transaction_details"))
 				       {
-				    	   customerRepository.findAll().forEach(customers::add);
+				    	   transactionRepository.findAll().forEach(transactionDetails::add);
+				    	   if(lemmas.size()==1)
+				    	   {
+				    		   String jsonFromPojo = gsonBuilder.toJson(transactionDetails);
+				    		  
+				    		   return jsonFromPojo;
+				    	   }
 				    	   flag=1;
 				       }
 				       else
 				       {
-				    	   fw.flush();
-				    	   fw.close();
-				    	  // FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
-			    		   //fr.close();
-				    	   return "please enter the correct sentence :(";
+				    	   
+				    	   System.out.println("error 1");
+				    	   String errorMessage="[{\"please enter the correct sentence\" :\"error 1-No Table found\"}]";
+				    	  
+				    	   return errorMessage;
 				       }
 				       break;
 				    }
@@ -228,7 +271,7 @@ public class NlpService
 			{
 				numberCondition=lemmas.get(tagsIterator);
 			}
-			else if(tags.get(tagsIterator).equals("JJ"))
+			else if(tags.get(tagsIterator).equals("JJ")||tags.get(tagsIterator).equals("RB"))
 			{
 				adjectiveCondition=lemmas.get(tagsIterator);
 			}
@@ -238,18 +281,28 @@ public class NlpService
 				break;
 			}
 	 	}
+	 	if(flag==0)
+	 	{
+	 		
+	 		System.out.println("error 2");
+	 		String errorMessage="[{\"please enter the correct sentence\" :\"error 1-No Table found\"}]";
+	    	  
+	    	   return errorMessage;
+	 	}
 	 	tagsIterator++;
 	 	List<String> columnAttributes=new ArrayList<>();
 	 	List<String> columnValues=new ArrayList<>();
 	 	List<String> conjunctions=new ArrayList<>();
+	 	String columnValueMatch=null;
 	 	flag=0;
 	 	for(;tagsIterator<tags.size();tagsIterator++)
 	 	{
 	 		if(tags.get(tagsIterator).equals("NN")==true  || tags.get(tagsIterator).equals("NNS")==true
 	 			   ||tags.get(tagsIterator).equals("NNPS")==true || tags.get(tagsIterator).equals("NNP")==true
-	 			   ||tags.get(tagsIterator).equals("VB")==true   || tags.get(tagsIterator).equals("VBG")==true
-	 			   ||tags.get(tagsIterator).equals("VBD")==true  || tags.get(tagsIterator).equals("VBN")==true
-	 			   ||tags.get(tagsIterator).equals("VBP")==true||tags.get(tagsIterator).equals("CD"))
+	 			   ||tags.get(tagsIterator).equals("VBZ")||tags.get(tagsIterator).equals("VB")==true   
+	 			   || tags.get(tagsIterator).equals("VBG")==true||tags.get(tagsIterator).equals("VBD")==true  
+	 			   || tags.get(tagsIterator).equals("VBN")==true||tags.get(tagsIterator).equals("VBP")==true
+	 			   ||tags.get(tagsIterator).equals("CD")||tags.get(tagsIterator).equals("RB"))
 	 		{
 	 			
 	 			if(tableName.equals("customer"))
@@ -258,15 +311,43 @@ public class NlpService
 	 				System.out.println(columnName+"    "+lemmas.get(tagsIterator));
 	 				if(columnName.equals("no_match_found"))
 	 				{
+	 					System.out.println(flag+ " hello  hai "+columnName+"  "+lemmas.get(tagsIterator));
 	 					if(flag==0)
 	 					{
-	 						columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
 	 					}
-	 					columnValues.add(lemmas.get(tagsIterator));
-	 					flag=0;
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
+	 					}
 	 				}
 	 				else
 	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
 	 					columnAttributes.add(columnName);
 		 				flag=1;
 
@@ -277,15 +358,230 @@ public class NlpService
 	 				String columnName=BranchColumns.isBranchColumn(lemmas.get(tagsIterator));
 	 				if(columnName.equals("no_match_found"))
 	 				{
+	 					System.out.println(flag+ " hello  hai "+columnName+"  "+lemmas.get(tagsIterator));
 	 					if(flag==0)
 	 					{
-	 						columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
+	 					}
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
+	 					}
+	 				}
+	 				else
+	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
+	 					columnAttributes.add(columnName);
+		 				flag=1;
+	 				}
+	 			}
+	 			else if(tableName.equals("atm_terminal"))
+	 			{
+	 				String columnName=TerminalColumns.isTerminalColumn(lemmas.get(tagsIterator));
+	 				System.out.println(columnName+" hello hai bye");
+	 				if(columnName.equals("no_match_found"))
+	 				{
+	 					System.out.println(flag+ " hello  hai "+columnName+"  "+lemmas.get(tagsIterator));
+	 					if(flag==0)
+	 					{
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
+	 					}
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
+	 					}
+	 				}
+	 				else
+	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
+	 					columnAttributes.add(columnName);
+		 				flag=1;
+	 				}
+	 			}
+	 			else if(tableName.equals("account_details"))
+	 			{
+	 				String columnName=AccountColumns.isAccountColumn(lemmas.get(tagsIterator));
+	 				if(columnName.equals("no_match_found"))
+	 				{
+	 					System.out.println(flag+ " hello  hai "+columnName+"  "+lemmas.get(tagsIterator));
+	 					if(flag==0)
+	 					{
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
+	 					}
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
+	 					}
+	 				}
+	 				else
+	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
+	 					columnAttributes.add(columnName);
+		 				flag=1;
+	 				}
+	 			}
+	 			else if(tableName.equals("card_details"))
+	 			{
+	 				String columnName=CardDetailsColumns.isCardDetailsColumn(lemmas.get(tagsIterator));
+	 				if(columnName.equals("no_match_found"))
+	 				{
+	 					if(flag==0)
+	 					{
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
+	 					}
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
 	 					}
 	 					columnValues.add(lemmas.get(tagsIterator));
 	 					flag=0;
 	 				}
 	 				else
 	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
+	 					columnAttributes.add(columnName);
+		 				flag=1;
+	 				}
+	 			}
+	 			else if(tableName.equals("transaction_details"))
+	 			{
+	 				String columnName=TransactionDetailsColumns.isTransactionColumn(lemmas.get(tagsIterator));
+	 				if(columnName.equals("no_match_found"))
+	 				{
+	 					if(flag==0)
+	 					{
+	 						if(columnAttributes.size()==0)
+	 						{
+	 							String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+						    	  
+		 				    	return errorMessage;
+	 						}
+	 						else
+	 						{
+	 							columnAttributes.add(columnAttributes.get(columnAttributes.size()-1));
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 						//	flag=1;
+	 						}
+	 					}
+	 					else if(flag==1)
+	 					{
+	 						if(tags.get(tagsIterator).equals("VBZ"))
+	 						{
+	 							columnValueMatch=lemmas.get(tagsIterator);
+	 						}
+	 						else
+	 						{
+	 							columnValues.add(lemmas.get(tagsIterator));
+	 							flag=0;
+	 						}
+	 					}
+	 					columnValues.add(lemmas.get(tagsIterator));
+	 					flag=0;
+	 				}
+	 				else
+	 				{
+	 					if(columnAttributes.size()!=columnValues.size())
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details\"}]";
+					    	  
+	 				    	return errorMessage;
+	 					}
 	 					columnAttributes.add(columnName);
 		 				flag=1;
 	 				}
@@ -295,16 +591,23 @@ public class NlpService
 	 		{
 	 			conjunctions.add(lemmas.get(tagsIterator));
 	 		}
+	 		else
+	 		{
+	 			String errorMessage="[{\"please enter the correct sentence\" :\"error 2-Incorrect column details3\"}]";
+		    	  
+		    	   return errorMessage;
+	 		
+	 		}
 	 	}
 	 	System.out.println(columnAttributes.size()+"    "+columnValues.size()+"     "+conjunctions.size());
 	 	if(columnAttributes.size()!=columnValues.size())
 	 	{
-	 		String jsonFromPojo = gsonBuilder.toJson(customers);
- 		   fw.write(jsonFromPojo);    
- 		   fw.flush();
-	           fw.close();  
-	         
- 		   return "Please enter the correct sentence :(";
+	 		//String jsonFromPojo = gsonBuilder.toJson(customers);
+ 		  
+	           System.out.println("error 4");
+ 		   String errorMessage="[{\"please enter the correct sentence\" :\"2-Incorrect column details4\"}]";
+	    	  
+    	   return errorMessage;
 	 	}
 	 	//System.out.println(columnAttributes.get(0)+" "+columnValues.get(0)+" "+columnAttributes.get(1)+" "+columnValues.get(1));
 	 	if(columnAttributes.size()>0)
@@ -314,22 +617,135 @@ public class NlpService
 	 			System.out.println("hello dheeraj");
 	 			if(tableName.equals("customer"))
 	 			{
-	 				System.out.println("hello inner loop");
-	 				customers=CustomerColumns.filterOnSingleCondition(customers,columnAttributes.get(0),columnValues.get(0));
-	 				//customers=customerRepository.findResultsBySingleCondition(columnAttributes.get(0), columnValues.get(0));
-	 				for(Customer c:customers)
+	 				if(columnValueMatch==null)
 	 				{
-	 					System.out.println(c);
+	 					customers=CustomerColumns.filterOnSingleCondition(customers,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					customers=customerRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(customers.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
 	 				}
 	 				if(adjectiveCondition==null && numberCondition==null)
 	 				{
 	 				String jsonFromPojo = gsonBuilder.toJson(customers);
-		    		   fw.write(jsonFromPojo);    
-		    		   fw.flush();
-			           fw.close();  
-			          // FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
+		    		   
+	 			//	String errorMessage="[{\"please enter the correct sentence\" :\"error \"}]";
+	 		    	return jsonFromPojo;  
+	 	    	  // return errorMessage;
+	 				}
+	 			}
+	 			else if(tableName.equals("bank_branch_details"))
+	 			{
+	 				if(columnValueMatch==null)
+	 				{
+	 					bankDetails=BranchColumns.filterOnSingleCondition(bankDetails,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					bankDetails=bankRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(bankDetails.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
+	 				}
+	 				if(adjectiveCondition==null && numberCondition==null)
+	 				{
+	 				String jsonFromPojo = gsonBuilder.toJson(bankDetails);
+		    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("atm_terminal"))
+	 			{
+	 				if(columnValueMatch==null)
+	 				{
+	 					atmDetails=TerminalColumns.filterOnSingleCondition(atmDetails,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					atmDetails=atmRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(atmDetails.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
+	 				}
+	 				if(adjectiveCondition==null && numberCondition==null)
+	 				{
+	 				String jsonFromPojo = gsonBuilder.toJson(atmDetails);
+		    		   
+		    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("account_details"))
+	 			{
+	 				if(columnValueMatch==null)
+	 				{
+	 					accountDetails=AccountColumns.filterOnSingleCondition(accountDetails,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					accountDetails=accountRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(atmDetails.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
+	 				}
+	 				if(adjectiveCondition==null && numberCondition==null)
+	 				{
+	 				String jsonFromPojo = gsonBuilder.toJson(accountDetails);
 		    		  
-		    		   return "viewTable.html";
+		    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("card_details"))
+	 			{
+	 				if(columnValueMatch==null)
+	 				{
+	 					cardDetails=CardDetailsColumns.filterOnSingleCondition(cardDetails,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					cardDetails=cardRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(cardDetails.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
+	 				}
+	 				if(adjectiveCondition==null && numberCondition==null)
+	 				{
+	 				String jsonFromPojo = gsonBuilder.toJson(cardDetails);
+		    		   
+		    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("transaction_details"))
+	 			{
+	 				if(columnValueMatch==null)
+	 				{
+	 					transactionDetails=TransactionDetailsColumns.filterOnSingleCondition(transactionDetails,columnAttributes.get(0),columnValues.get(0));
+	 				}
+	 				else
+	 				{
+	 					transactionDetails=transactionRepository.likeMethod(columnAttributes.get(0),columnValues.get(0),columnValueMatch);
+	 					if(transactionDetails.size()==0)
+	 					{
+	 						String errorMessage="[{\"please enter the correct sentence\" :\"error1 \"}]";
+	 		 	    	    return errorMessage;
+	 					}
+	 				}
+	 				if(adjectiveCondition==null && numberCondition==null)
+	 				{
+	 				String jsonFromPojo = gsonBuilder.toJson(cardDetails);
+		    		 
+		    		   return jsonFromPojo;
 	 				}
 	 			}
 	 		}
@@ -339,22 +755,68 @@ public class NlpService
 	 			{
 	 				if(conjunctions.size()==0 || (conjunctions.size()+1)!=columnAttributes.size())
 	 				{
-	 					fw.flush();
-	 					fw.close();
-	 				//	 FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
-			    		//   fr.close();
-			    		return "Please enter the correct sentence :(";
+	 					String errorMessage="[{\"please enter the correct sentence\" :\"error2\"}]";
+	 			    	  
+	 		    	   return errorMessage;
+			    		
 	 				}
 	 				else
 	 				{
 	 					customers=customerRepository.findResultsByTwoConditions(columnAttributes.get(0), columnValues.get(0), conjunctions.get(0), columnAttributes.get(1), columnValues.get(1));
 	 					String jsonFromPojo = gsonBuilder.toJson(customers);
-			    		   fw.write(jsonFromPojo);    
-			    		   fw.flush();
-				           fw.close();  
-				           //FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
-			    	
-			    		   return "viewTable.html";
+			    		  
+			    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("bank_branch_details"))
+	 			{
+	 				if(conjunctions.size()==0 || (conjunctions.size()+1)!=columnAttributes.size())
+	 				{
+	 					
+	 					String errorMessage="[{\"please enter the correct sentence\" :\"error3\"}]";
+	 			    	  
+	 		    	   return errorMessage;
+	 				}
+	 				else
+	 				{
+	 					bankDetails=bankRepository.findResultsByTwoConditions(columnAttributes.get(0), columnValues.get(0), conjunctions.get(0), columnAttributes.get(1), columnValues.get(1));
+	 					String jsonFromPojo = gsonBuilder.toJson(bankDetails);
+			    		  
+			    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("atm_terminal"))
+	 			{
+	 				if(conjunctions.size()==0 || (conjunctions.size()+1)!=columnAttributes.size())
+	 				{
+	 					
+	 					String errorMessage="[{\"please enter the correct sentence\" :\"error4\"}]";
+	 			    	  
+	 		    	   return errorMessage;
+	 				}
+	 				else
+	 				{
+	 					atmDetails=atmRepository.findResultsByTwoConditions(columnAttributes.get(0), columnValues.get(0), conjunctions.get(0), columnAttributes.get(1), columnValues.get(1));
+	 					String jsonFromPojo = gsonBuilder.toJson(atmDetails);
+			    		  
+			    		   return jsonFromPojo;
+	 				}
+	 			}
+	 			else if(tableName.equals("account_details"))
+	 			{
+	 				if(conjunctions.size()==0 || (conjunctions.size()+1)!=columnAttributes.size())
+	 				{
+	 					
+	 					String errorMessage="[{\"please enter the correct sentence\" :\"error5\"}]";
+	 			    	  
+	 		    	   return errorMessage;
+	 				}
+	 				else
+	 				{
+	 					accountDetails=accountRepository.findResultsByTwoConditions(columnAttributes.get(0), columnValues.get(0), conjunctions.get(0), columnAttributes.get(1), columnValues.get(1));
+	 					String jsonFromPojo = gsonBuilder.toJson(atmDetails);
+			    		   
+			    		   return jsonFromPojo;
 	 				}
 	 			}
 	 		}
@@ -392,22 +854,98 @@ public class NlpService
 	 				}
 	 			}
 	 			String jsonFromPojo = gsonBuilder.toJson(customers);
-	    		   fw.write(jsonFromPojo);    
-	    		   fw.flush();
-		           fw.close();  
-		          // FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
-	    		  // fr.close();
+	    		   
 		       
-	    		   return "viewTable.html";
+	    		   return jsonFromPojo;
 	 		}
+	 		else if(tableName.equals("bank_branch_details"))
+	 		{
+	 			int number=1;
+	 			if(numberCondition!=null)
+	 			{
+	 				number=Integer.valueOf(numberCondition)>bankDetails.size()?bankDetails.size():Integer.valueOf(numberCondition);
+	 			}
+	 			if(adjectiveCondition.equals("first"))
+	 			{
+	 				for(int i=number;i<bankDetails.size();i++)
+	 				{
+	 					bankDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			if(adjectiveCondition.equals("last"))
+	 			{
+	 				for(int i=0;i<bankDetails.size()-number;i++)
+					{
+	 					bankDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			String jsonFromPojo = gsonBuilder.toJson(bankDetails);
+	    		
+	    		   return jsonFromPojo;
+	 		}
+	 		else if(tableName.equals("atm_terminal"))
+	 		{
+	 			int number=1;
+	 			if(numberCondition!=null)
+	 			{
+	 				number=Integer.valueOf(numberCondition)>atmDetails.size()?atmDetails.size():Integer.valueOf(numberCondition);
+	 			}
+	 			if(adjectiveCondition.equals("first"))
+	 			{
+	 				for(int i=number;i<atmDetails.size();i++)
+	 				{
+	 					atmDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			if(adjectiveCondition.equals("last"))
+	 			{
+	 				for(int i=0;i<atmDetails.size()-number;i++)
+					{
+	 					atmDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			String jsonFromPojo = gsonBuilder.toJson(atmDetails);
+	    		  
+	    		   return jsonFromPojo;
+	 		}
+	 		else if(tableName.equals("account_details"))
+	 		{
+	 			int number=1;
+	 			if(numberCondition!=null)
+	 			{
+	 				number=Integer.valueOf(numberCondition)>accountDetails.size()?accountDetails.size():Integer.valueOf(numberCondition);
+	 			}
+	 			if(adjectiveCondition.equals("first"))
+	 			{
+	 				for(int i=number;i<accountDetails.size();i++)
+	 				{
+	 					accountDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			if(adjectiveCondition.equals("last"))
+	 			{
+	 				for(int i=0;i<accountDetails.size()-number;i++)
+					{
+	 					accountDetails.remove(i);
+	 					i--;
+	 				}
+	 			}
+	 			String jsonFromPojo = gsonBuilder.toJson(accountDetails);
+	    		  
+	    		   return jsonFromPojo;
+	 		}
+	 		
 	 	}
-	 	// FileReader fr=new FileReader("C:\\Users\\dheer\\Desktop\\nlidb\\nlidb\\src\\main\\resources\\static\\project.json");
-		  
-	 	//f.close();
-	 	
-	 	fw.close();
 	 
-	 	return "Please enter the correct sentence :(";
+	 	
+	 	String errorMessage="[{\"please enter the correct sentence\" :\"error6\"}]";
+  	  
+ 	   return errorMessage;
 	}
 	
 }

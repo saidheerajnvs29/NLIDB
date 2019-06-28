@@ -29,11 +29,11 @@ public class HomeController
 	@Autowired
 	private StopWord stopWord;
 	
-	@RequestMapping(value="/submitQuery",method=RequestMethod.GET)
-	public String obtainResults(@RequestParam("name")String name,ModelAndView model) throws InvalidFormatException, IOException
+	@RequestMapping(value="/submitQuery",method=RequestMethod.POST)
+	public String obtainResults(@RequestParam("name")String name,Model model) throws InvalidFormatException, IOException
 	{
 		
-		model.setViewName("querySubmit.jsp");
+		//model.setViewName("querySubmit.jsp");
 		//for tokenisation of the input string
 		String[] tokens=serviceProvider.getTokens(name);
 		
@@ -69,7 +69,7 @@ public class HomeController
 		{
 			if(stopWord.isStopWord(lemmas.get(i))==true)
 			{
-				//System.out.println("hi "+lemmas.get(i));
+				System.out.println(lemmas.get(i)+"    "+tags.get(i));
 				lemmas.remove(lemmas.get(i));
 				tags.remove(tags.get(i));
 				i--;
@@ -79,7 +79,9 @@ public class HomeController
 		{
 			System.out.println(lemmas.get(i)+" "+tags.get(i));
 		}
-		return serviceProvider.getResults(lemmas, tags);
+		String jsonContent= serviceProvider.getResults(lemmas, tags);
+		model.addAttribute("jsonContent",jsonContent);
+		return "index";
 		
 		
 	}

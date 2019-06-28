@@ -12,6 +12,7 @@ public class AtmTerminal {
 	@Id
 	private int terminalId;
 	private String terminalLocation;
+	private String terminalStatus;
 	
 	@Column(name="terminal_id")
 	public int getTerminalId() {
@@ -22,7 +23,12 @@ public class AtmTerminal {
 	public String getTerminalLocation() {
 		return terminalLocation;
 	}
-
+	
+	@Column(name="terminal_status",nullable=false,unique=true)
+	public String getTerminalStatus() {
+		return terminalStatus;
+	}
+	
 	@Override
 	public String toString() {
 		return "AtmTerminal [terminalId=" + terminalId + ", terminalLocation=" + terminalLocation + "]";

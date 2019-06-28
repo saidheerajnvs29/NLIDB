@@ -1,6 +1,6 @@
 package org.ncr.nlidb.model;
 
-import java.time.LocalDateTime;
+
 import javax.persistence.*;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +20,7 @@ public class TransactionDetails {
 	private int transactionId;
 	private String transactionStatus;
 	private String transactionResponseCode;
-	private LocalDateTime transactionDateTime;
+	private String transactionDate;
 	private int transactionAmount;
 	private int cardId;
 	private int terminalId;
@@ -50,9 +50,9 @@ public String getTransactionStatus() {
 public String getTransactionResponseCode() {
 	return transactionResponseCode;
 }
-@Column(name="transaction_date_time",nullable=false)
-public LocalDateTime getTrasactionDateTime() {
-	return transactionDateTime;
+@Column(name="transaction_date",nullable=false)
+public String getTransactionDate() {
+	return transactionDate;
 }
 @Column(name="transaction_amount",nullable=false)
 public int getTransactionAmount() {
@@ -70,7 +70,7 @@ public int getTerminalID() {
 @Override
 public String toString() {
 	return "transactionDetails [TransactionID=" + transactionId + ", TransactionStatus=" + transactionStatus
-			+ ", TransactionResponseCode=" + transactionResponseCode + ", TrasactionDateTime=" + transactionDateTime
+			+ ", TransactionResponseCode=" + transactionResponseCode + ", TrasactionDateTime=" + transactionDate
 			+ ", TransactionAmount=" + transactionAmount + ", CardID=" + cardId + ", TerminalID=" + terminalId + "]";
 }	
 	

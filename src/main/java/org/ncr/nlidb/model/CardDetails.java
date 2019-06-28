@@ -1,6 +1,5 @@
 package org.ncr.nlidb.model;
 
-import java.sql.Date;
 
 import javax.persistence.*;
 import javax.persistence.Column;
@@ -12,8 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
 
 @Entity
 @Table(name="card_details")
@@ -26,8 +24,7 @@ public class CardDetails {
        @GeneratedValue(strategy = GenerationType.AUTO)
 	   private int cardId;
 	   private String cardNumber;
-	   private String cardHolderName;
-	   private Date expiryDate;
+	   private String cardExpiryDate;
 		private String cardStatus;
 		private int productId;
 		private int accountId;
@@ -52,18 +49,10 @@ public class CardDetails {
 		}
 		
 		
-		@Column(name="card_holder_name",nullable=false)
-		public String getCardHolderName() {
-			return cardHolderName;
-		}
-
 		
-		
-		@Temporal(TemporalType.DATE)
 		@Column(name="card_expiry_date",nullable=false)
-
-		public Date getExpiryDate() {
-			return expiryDate;
+		public String getExpiryDate() {
+			return cardExpiryDate;
 		}
 		
 		
@@ -88,8 +77,8 @@ public class CardDetails {
 		
 	@Override
 		public String toString() {
-			return "CardDetails [CardID=" + cardId + ", CardNumber=" + cardNumber + ", CardHolderName=" + cardHolderName
-					+ ", ExpiryDate=" + expiryDate + ", CardStatus=" + cardStatus + ", ProductID=" + productId
+			return "CardDetails [CardID=" + cardId + ", CardNumber=" + cardNumber
+					+ ", ExpiryDate=" + cardExpiryDate + ", CardStatus=" + cardStatus + ", ProductID=" + productId
 					+ ", AccountID=" + accountId + "]";
 		}
 
